@@ -1,7 +1,7 @@
 import express from 'express';
 import { loadConfig, isDevMode, getPort } from './config.js';
 import { logInfo, logError } from './logger.js';
-import universalRouter from './routes-universal.js';
+import gatewayRouter from './gateway/routes.js';
 import { initializeAuth } from './auth.js';
 
 const app = express();
@@ -20,7 +20,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(universalRouter);
+app.use(gatewayRouter);
 
 app.get('/', (req, res) => {
   res.json({

@@ -28,6 +28,42 @@
 
 ---
 
+## 📁 Project Structure
+
+The gateway is organized into modular components for maintainability:
+
+```
+droid2api/
+├── gateway/
+│   ├── routes.js                    # Main gateway routing logic
+│   ├── format-detector.js           # Format detection (OpenAI/Anthropic/Gemini)
+│   ├── backend-selector.js          # Backend selection logic
+│   └── backend-handlers.js          # Backend-specific request handlers
+├── utils/
+│   └── transformers/
+│       ├── gemini-to-openai.js      # Gemini → OpenAI request transformer
+│       ├── anthropic-to-openai.js   # Anthropic → OpenAI request transformer
+│       ├── openai-to-gemini.js      # OpenAI → Gemini response transformer
+│       ├── openai-to-anthropic.js   # OpenAI → Anthropic response transformer
+│       ├── stream-to-gemini.js      # OpenAI SSE → Gemini SSE transformer
+│       └── stream-to-anthropic.js   # OpenAI SSE → Anthropic SSE transformer
+├── logger.js                        # Logging utilities
+├── config.js                        # Configuration management
+├── auth.js                          # Authentication handling
+├── server.js                        # Main server entry point
+└── package.json                     # Dependencies
+```
+
+### Module Responsibilities:
+
+- **gateway/routes.js**: Main routing logic that orchestrates format detection, transformation, and backend routing
+- **gateway/format-detector.js**: Detects API format based on endpoint path
+- **gateway/backend-selector.js**: Selects appropriate backend based on environment configuration
+- **gateway/backend-handlers.js**: Handles requests to different backends (Claude Code, claude-code-router, config-based)
+- **utils/transformers/***: Modular transformers for converting between API formats
+
+---
+
 ## 🚀 Installation
 
 ### 1. Install Dependencies
@@ -595,4 +631,3 @@ DEBUG=true npm start
 ---
 
 Happy multi-format AI development! 🚀
-
