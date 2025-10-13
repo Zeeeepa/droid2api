@@ -5,8 +5,10 @@ import { logInfo, logDebug, logError, logRequest, logResponse } from './logger.j
 import { transformToAnthropic, getAnthropicHeaders } from './transformers/request-anthropic.js';
 import { transformToOpenAI, getOpenAIHeaders } from './transformers/request-openai.js';
 import { transformToCommon, getCommonHeaders } from './transformers/request-common.js';
+import { transformToGemini, getGeminiHeaders } from './transformers/request-gemini.js';
 import { AnthropicResponseTransformer } from './transformers/response-anthropic.js';
 import { OpenAIResponseTransformer } from './transformers/response-openai.js';
+import { GeminiResponseTransformer } from './transformers/response-gemini.js';
 import { getApiKey } from './auth.js';
 
 const router = express.Router();
@@ -138,13 +140,22 @@ async function handleChatCompletions(req, res) {
     } else if (model.type === 'common') {
       transformedRequest = transformToCommon(requestWithRedirectedModel);
       headers = getCommonHeaders(authHeader, clientHeaders);
+    } else if (model.type === 'gemini') {
+      transformedRequest = transformToGemini(requestWithRedirectedModel);
+      headers = getGeminiHeaders(authHeader, clientHeaders);
     } else {
       return res.status(500).json({ error: `Unknown endpoint type: ${model.type}` });
     }
 
+    // Construct URL - Gemini needs model name in path
+    let apiUrl = endpoint.base_url;
+    if (model.type === 'gemini') {
+      const streamingSuffix = transformedRequest.stream ? 'streamGenerateContent' : 'generateContent';
+      apiUrl = `${endpoint.base_url}/${modelId}:${streamingSuffix}`;
+    }
     logRequest('POST', endpoint.base_url, headers, transformedRequest);
 
-    const response = await fetch(endpoint.base_url, {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify(transformedRequest)
@@ -187,6 +198,8 @@ async function handleChatCompletions(req, res) {
           transformer = new AnthropicResponseTransformer(modelId, `chatcmpl-${Date.now()}`);
         } else if (model.type === 'openai') {
           transformer = new OpenAIResponseTransformer(modelId, `chatcmpl-${Date.now()}`);
+        } else if (model.type === 'gemini') {
+          transformer = new GeminiResponseTransformer(modelId, `chatcmpl-${Date.now()}`);
         }
 
         try {
@@ -214,6 +227,17 @@ async function handleChatCompletions(req, res) {
         }
       } else {
         // anthropic/common: 保持现有逻辑，直接转发
+      } else if (model.type === 'gemini') {
+        // Convert Gemini response to OpenAI format
+        try {
+          const transformer = new GeminiResponseTransformer(modelId, `chatcmpl-${Date.now()}`);
+          const converted = transformer.transformResponse(data);
+          logResponse(200, null, converted);
+          res.json(converted);
+        } catch (e) {
+          logResponse(200, null, data);
+          res.json(data);
+        }
         logResponse(200, null, data);
         res.json(data);
       }
@@ -311,7 +335,7 @@ async function handleDirectResponses(req, res) {
     logRequest('POST', endpoint.base_url, headers, modifiedRequest);
 
     // 转发修改后的请求
-    const response = await fetch(endpoint.base_url, {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify(modifiedRequest)
@@ -458,7 +482,7 @@ async function handleDirectMessages(req, res) {
     logRequest('POST', endpoint.base_url, headers, modifiedRequest);
 
     // 转发修改后的请求
-    const response = await fetch(endpoint.base_url, {
+    const response = await fetch(apiUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify(modifiedRequest)
