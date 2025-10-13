@@ -16,6 +16,10 @@
     {
       "name": "common",
       "base_url": "https://app.factory.ai/api/llm/o/v1/chat/completions"
+    },
+    {
+      "name": "gemini",
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/models"
     }
   ],
   "models": [
@@ -53,6 +57,36 @@
       "name": "GLM-4.6",
       "id": "glm-4.6",
       "type": "common"
+    },
+    {
+      "name": "Gemini 2.5 Flash",
+      "id": "gemini-2.5-flash",
+      "type": "gemini",
+      "reasoning": "off"
+    },
+    {
+      "name": "Gemini 2.5 Flash Lite",
+      "id": "gemini-2.5-flash-lite",
+      "type": "gemini",
+      "reasoning": "off"
+    },
+    {
+      "name": "Gemini 2.5 Pro",
+      "id": "gemini-2.5-pro",
+      "type": "gemini",
+      "reasoning": "auto"
+    },
+    {
+      "name": "Gemini 2.0 Flash Thinking",
+      "id": "gemini-2.0-flash-thinking",
+      "type": "gemini",
+      "reasoning": "medium"
+    },
+    {
+      "name": "Gemini 2.5 Pro Thinking",
+      "id": "gemini-2.5-pro-thinking",
+      "type": "gemini",
+      "reasoning": "high"
     }
   ],
   "dev_mode": false,
