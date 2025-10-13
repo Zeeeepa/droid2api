@@ -1,18 +1,36 @@
 {
   "name": "droid2api",
-  "version": "1.3.3",
-  "description": "OpenAI Compatible API Proxy",
+  "version": "2.0.0",
+  "description": "Universal AI API Gateway - OpenAI, Anthropic, Gemini Compatible",
   "main": "server.js",
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "install-deps": "npm install -g @anthropic-ai/claude-code @musistudio/claude-code-router"
   },
-  "keywords": ["openai", "api", "proxy"],
+  "keywords": [
+    "openai",
+    "anthropic",
+    "gemini",
+    "api",
+    "proxy",
+    "gateway",
+    "claude",
+    "universal"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
     "node-fetch": "^3.3.2"
+  },
+  "optionalDependencies": {
+    "@anthropic-ai/claude-code": "latest",
+    "@musistudio/claude-code-router": "latest"
+  },
+  "peerDependencies": {
+    "@anthropic-ai/claude-code": ">=1.0.0",
+    "@musistudio/claude-code-router": ">=1.0.0"
   }
 }
