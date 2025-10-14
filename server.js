@@ -1,7 +1,7 @@
 import express from 'express';
 import { loadConfig, isDevMode, getPort } from './config.js';
 import { logInfo, logError } from './logger.js';
-import router from './routes.js';
+import gatewayRouter from './gateway/routes.js';
 import { initializeAuth } from './auth.js';
 
 const app = express();
@@ -20,19 +20,28 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(router);
+app.use(gatewayRouter);
 
 app.get('/', (req, res) => {
   res.json({
     name: 'droid2api',
-    version: '1.0.0',
-    description: 'OpenAI Compatible API Proxy',
+    version: '2.0.0',
+    description: 'Universal API Gateway - OpenAI, Anthropic & Gemini formats',
+    backends: [
+      'Claude Code (@anthropic-ai/claude-code)',
+      'claude-code-router (@musistudio/claude-code-router)'
+    ],
     endpoints: [
-      'GET /v1/models',
-      'POST /v1/chat/completions',
-      'POST /v1/responses',
-      'POST /v1/messages',
-      'POST /v1/messages/count_tokens'
+      'POST /v1/chat/completions (OpenAI format)',
+      'POST /v1/messages (Anthropic format)',
+      'POST /v1/generateContent (Gemini format)',
+      'GET /v1/models'
+    ],
+    features: [
+      'Multi-format input (OpenAI, Anthropic, Gemini)',
+      'Format-matched responses',
+      'Streaming support',
+      'Backend routing (Claude Code / claude-code-router)'
     ]
   });
 });
@@ -85,14 +94,13 @@ app.use((req, res, next) => {
 
   res.status(404).json({
     error: 'Not Found',
-    message: `路径 ${req.method} ${req.path} 不存在`,
+    message: `Path ${req.method} ${req.path} does not exist`,
     timestamp: errorInfo.timestamp,
     availableEndpoints: [
-      'GET /v1/models',
-      'POST /v1/chat/completions',
-      'POST /v1/responses',
-      'POST /v1/messages',
-      'POST /v1/messages/count_tokens'
+      'POST /v1/chat/completions (OpenAI format)',
+      'POST /v1/messages (Anthropic format)',
+      'POST /v1/generateContent (Gemini format)',
+      'GET /v1/models'
     ]
   });
 });
@@ -122,12 +130,21 @@ app.use((err, req, res, next) => {
   const server = app.listen(PORT)
     .on('listening', () => {
       logInfo(`Server running on http://localhost:${PORT}`);
+      logInfo('🌍 Universal API Gateway - Ready!');
       logInfo('Available endpoints:');
+      logInfo('  POST /v1/chat/completions    (OpenAI format)');
+      logInfo('  POST /v1/messages            (Anthropic format)');
+      logInfo('  POST /v1/generateContent     (Gemini format)');
       logInfo('  GET  /v1/models');
-      logInfo('  POST /v1/chat/completions');
-      logInfo('  POST /v1/responses');
-      logInfo('  POST /v1/messages');
-      logInfo('  POST /v1/messages/count_tokens');
+      logInfo('');
+      logInfo('Backend routing:');
+      if (process.env.ANTHROPIC_BASE_URL) {
+        logInfo(`  ✓ Claude Code: ${process.env.ANTHROPIC_BASE_URL}`);
+      } else if (process.env.OPENAI_BASE_URL) {
+        logInfo(`  ✓ claude-code-router: ${process.env.OPENAI_BASE_URL}`);
+      } else {
+        logInfo('  ✓ Using config.json routing');
+      }
     })
     .on('error', (err) => {
       if (err.code === 'EADDRINUSE') {
