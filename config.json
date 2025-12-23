@@ -2,8 +2,7 @@
   "port": 3000,
   "model_redirects": {
     "claude-3-5-haiku-20241022": "claude-haiku-4-5-20251001",
-    "claude-sonnet-4-5": "claude-sonnet-4-5-20250929",
-    "gpt-5":"gpt-5-2025-08-07"
+    "claude-sonnet-4-5": "claude-sonnet-4-5-20250929"
   },
   "endpoint": [
     {
@@ -21,13 +20,6 @@
   ],
   "proxies": [],
   "models": [
-    {
-      "name": "Opus 4.1",
-      "id": "claude-opus-4-1-20250805",
-      "type": "anthropic",
-      "reasoning": "auto",
-      "provider": "anthropic"
-    },
     {
       "name": "Opus 4.5",
       "id": "claude-opus-4-5-20251101",
@@ -62,10 +54,17 @@
       "type": "openai",
       "reasoning": "off",
       "provider": "openai"
-    },    
+    },
     {
       "name": "GPT-5.1 Codex Max",
       "id": "gpt-5.1-codex-max",
+      "type": "openai",
+      "reasoning": "auto",
+      "provider": "openai"
+    },
+    {
+      "name": "GPT-5.2",
+      "id": "gpt-5.2",
       "type": "openai",
       "reasoning": "auto",
       "provider": "openai"
@@ -80,6 +79,13 @@
     {
       "name": "Gemini-3-Pro",
       "id": "gemini-3-pro-preview",
+      "type": "common",
+      "reasoning": "auto",
+      "provider": "google"
+    },
+    {
+      "name": "Gemini-3-Flash",
+      "id": "gemini-3-flash-preview",
       "type": "common",
       "reasoning": "auto",
       "provider": "google"
