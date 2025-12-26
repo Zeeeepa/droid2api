@@ -77,6 +77,13 @@
       "provider": "fireworks"
     },
     {
+      "name": "GLM-4.7",
+      "id": "glm-4.7",
+      "type": "common",
+      "reasoning": "off",
+      "provider": "fireworks"
+    },
+    {
       "name": "Gemini-3-Pro",
       "id": "gemini-3-pro-preview",
       "type": "common",
